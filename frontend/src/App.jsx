@@ -26,11 +26,16 @@ export default function App() {
   const [education, setEducation] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Admin route detector (Commented out for production safety; see README.md to re-enable)
+  const [isAdmin, setIsAdmin] = useState(false);
+  /* To re-enable /admin route, replace line above with:
   const [isAdmin, setIsAdmin] = useState(
     window.location.pathname === '/admin' || window.location.hash === '#/admin' || window.location.hash === '#admin'
   );
+  */
 
   useEffect(() => {
+    /* To re-enable route change listener for /admin:
     const handleRouteChange = () => {
       setIsAdmin(
         window.location.pathname === '/admin' || window.location.hash === '#/admin' || window.location.hash === '#admin'
@@ -43,6 +48,7 @@ export default function App() {
       window.removeEventListener('popstate', handleRouteChange);
       window.removeEventListener('hashchange', handleRouteChange);
     };
+    */
   }, []);
 
   useEffect(() => {
@@ -96,7 +102,12 @@ export default function App() {
       </div>
 
       <div style={{ position: 'relative', zIndex: 1 }}>
-        {isAdmin ? (
+        {/* 
+          ADMIN PANEL SECTION (Commented out for production safety).
+          To re-enable AdminPanel view when isAdmin is true, uncomment the conditional block below.
+          Refer to README.md for complete configuration details.
+        */}
+        {false && isAdmin ? (
           <AdminPanel onBackToSite={handleBackToSite} />
         ) : (
           <>
