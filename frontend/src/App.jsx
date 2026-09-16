@@ -26,20 +26,19 @@ export default function App() {
   const [education, setEducation] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Admin route detector (Commented out for production safety; see README.md to re-enable)
-  const [isAdmin, setIsAdmin] = useState(false);
-  /* To re-enable /admin route, replace line above with:
-  const [isAdmin, setIsAdmin] = useState(
-    window.location.pathname === '/admin' || window.location.hash === '#/admin' || window.location.hash === '#admin'
+  // 404 detector for /admin or #admin (Returns 404 page when accessed; see README.md for admin portal instructions)
+  const [is404, setIs404] = useState(
+    window.location.pathname.toLowerCase().startsWith('/admin') ||
+    window.location.hash.toLowerCase().includes('admin')
   );
-  */
+
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    /* To re-enable route change listener for /admin:
     const handleRouteChange = () => {
-      setIsAdmin(
-        window.location.pathname === '/admin' || window.location.hash === '#/admin' || window.location.hash === '#admin'
-      );
+      const pathMatches = window.location.pathname.toLowerCase().startsWith('/admin');
+      const hashMatches = window.location.hash.toLowerCase().includes('admin');
+      setIs404(pathMatches || hashMatches);
     };
 
     window.addEventListener('popstate', handleRouteChange);
@@ -48,7 +47,6 @@ export default function App() {
       window.removeEventListener('popstate', handleRouteChange);
       window.removeEventListener('hashchange', handleRouteChange);
     };
-    */
   }, []);
 
   useEffect(() => {
@@ -89,6 +87,7 @@ export default function App() {
   const handleBackToSite = () => {
     window.history.pushState({}, '', '/');
     window.location.hash = '#home';
+    setIs404(false);
     setIsAdmin(false);
   };
 
@@ -102,12 +101,57 @@ export default function App() {
       </div>
 
       <div style={{ position: 'relative', zIndex: 1 }}>
-        {/* 
-          ADMIN PANEL SECTION (Commented out for production safety).
-          To re-enable AdminPanel view when isAdmin is true, uncomment the conditional block below.
-          Refer to README.md for complete configuration details.
-        */}
-        {false && isAdmin ? (
+        {is404 ? (
+          /* 404 NOT FOUND PAGE FOR /admin (See README.md to re-enable Admin Panel) */
+          <div
+            style={{
+              minHeight: '100vh',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '2rem 1rem',
+              textAlign: 'center',
+            }}
+          >
+            <div
+              className="glass-card"
+              style={{
+                maxWidth: '480px',
+                width: '100%',
+                padding: '3rem 2rem',
+                borderRadius: '1.5rem',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: '5.5rem',
+                  fontWeight: 900,
+                  lineHeight: 1,
+                  background: 'var(--accent-gradient)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  marginBottom: '0.75rem',
+                  fontFamily: 'monospace',
+                }}
+              >
+                404
+              </div>
+              <h2 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '0.75rem' }}>Page Not Found</h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '2rem' }}>
+                The requested URL <code style={{ color: 'var(--accent-primary)', background: 'rgba(239,68,68,0.12)', padding: '2px 8px', borderRadius: '4px' }}>/admin</code> could not be found or has been moved.
+              </p>
+              <button
+                onClick={handleBackToSite}
+                className="btn btn-primary"
+                style={{ padding: '0.85rem 2rem', fontSize: '0.95rem' }}
+              >
+                Return to Portfolio Home
+              </button>
+            </div>
+          </div>
+        ) : isAdmin ? (
           <AdminPanel onBackToSite={handleBackToSite} />
         ) : (
           <>
