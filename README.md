@@ -15,34 +15,62 @@ A modern, responsive personal portfolio website built with React, FastAPI, SQLit
 
 ---
 
-## Admin Panel Access (`/admin`)
+## Admin Panel Access (`/admin`) & 404 Route Configuration
 
 > [!NOTE]
-> For production security, the `/admin` portal route is **commented out by default** in `frontend/src/App.jsx`.
+> For production security, accessing `/admin` displays a **404 Page Not Found** screen by default, and the `/admin` portal component is commented out in `frontend/src/App.jsx`.
 
-### How to Re-Enable the `/admin` Route:
-To access the Admin Panel at `/admin` or `/#/admin` in local development or production:
+### Default Security Behavior:
+- Navigating to `/admin`, `/#/admin`, or `/#admin` displays a styled **404 Page Not Found** screen.
+
+### How to Re-Enable the Admin Panel (`/admin`):
+To enable the Admin Panel and switch off the 404 screen in `frontend/src/App.jsx`:
 
 1. Open `frontend/src/App.jsx`.
-2. Locate the `isAdmin` state declaration and uncomment the route listener:
+2. Disable the 404 detector and activate the `isAdmin` route detector:
 ```javascript
 // Change from:
+const [is404, setIs404] = useState(
+  window.location.pathname.toLowerCase().startsWith('/admin') ||
+  window.location.hash.toLowerCase().includes('admin')
+);
 const [isAdmin, setIsAdmin] = useState(false);
 
 // To:
+const [is404, setIs404] = useState(false);
 const [isAdmin, setIsAdmin] = useState(
-  window.location.pathname === '/admin' || window.location.hash === '#/admin' || window.location.hash === '#admin'
+  window.location.pathname.toLowerCase().startsWith('/admin') ||
+  window.location.hash.toLowerCase().includes('admin')
 );
 ```
-3. In the JSX render block of `App.jsx`, update the conditional renderer:
+
+3. In `handleRouteChange` inside `App.jsx`, update the active route setter:
 ```javascript
 // Change from:
-{false && isAdmin ? (
+setIs404(pathMatches || hashMatches);
+// setIsAdmin(pathMatches || hashMatches);
+
+// To:
+setIs404(false);
+setIsAdmin(pathMatches || hashMatches);
+```
+
+4. In the JSX return statement of `App.jsx`, update the conditional view:
+```javascript
+// Change from:
+{is404 ? (
+  /* 404 PAGE */
+) : false && isAdmin ? (
+  <AdminPanel onBackToSite={handleBackToSite} />
+)
 
 // To:
 {isAdmin ? (
+  <AdminPanel onBackToSite={handleBackToSite} />
+)
 ```
-4. Save `App.jsx` and navigate to `http://localhost:5173/admin` or `https://roshan-ganesh.vercel.app/#admin`.
+
+5. Save `App.jsx` and navigate to `http://localhost:5173/admin` or `https://roshan-ganesh.vercel.app/#admin`.
 
 ### Default Admin Credentials:
 - **Username**: `Roshan`
