@@ -208,6 +208,7 @@ export default function AdminPanel({ onBackToSite }) {
       const res = await adminLogin({ username: loginUsername, password: loginPassword });
       if (res.success) {
         sessionStorage.setItem('admin_authenticated', 'true');
+        localStorage.setItem('admin_authenticated', 'true');
         setIsAuthenticated(true);
         showToast('Welcome back, Roshan!');
         loadAllData();
@@ -221,9 +222,14 @@ export default function AdminPanel({ onBackToSite }) {
 
   const handleLogout = () => {
     sessionStorage.removeItem('admin_authenticated');
+    localStorage.removeItem('admin_authenticated');
+    sessionStorage.clear();
     setIsAuthenticated(false);
     setLoginPassword('');
     showToast('Logged out of Admin Panel.');
+    if (onBackToSite) {
+      onBackToSite();
+    }
   };
 
   // Forgot Password handler
