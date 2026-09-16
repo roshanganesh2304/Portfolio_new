@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 import { submitContactForm } from '../services/api';
 import { GithubIcon, LinkedinIcon } from './SocialIcons';
 
@@ -28,7 +29,34 @@ export default function Contact({ profile }) {
     setStatus({ submitting: true, success: false, error: null, message: '' });
 
     try {
+      // 1. Save to SQLite database via FastAPI backend
       const response = await submitContactForm(formData);
+
+      // 2. Trigger instant EmailJS notification if environment keys are configured
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+      if (serviceId && templateId && publicKey) {
+        try {
+          await emailjs.send(
+            serviceId,
+            templateId,
+            {
+              from_name: formData.name,
+              from_email: formData.email,
+              subject: formData.subject,
+              message: formData.message,
+              to_name: profile.name || 'Roshan Ganesh I',
+            },
+            publicKey
+          );
+          console.log('[EmailJS] Notification email sent successfully!');
+        } catch (emailErr) {
+          console.warn('[EmailJS] Failed to send email alert:', emailErr);
+        }
+      }
+
       setStatus({
         submitting: false,
         success: true,
