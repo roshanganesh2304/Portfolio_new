@@ -260,8 +260,10 @@ class ProfileUpdateRequest(BaseModel):
     email: Optional[str] = None
     linkedin: Optional[str] = None
     github: Optional[str] = None
+    avatar_url: Optional[str] = None
     summary: Optional[str] = None
     years_experience: Optional[str] = None
+
 
 @app.put("/api/admin/profile")
 def update_admin_profile(payload: ProfileUpdateRequest):

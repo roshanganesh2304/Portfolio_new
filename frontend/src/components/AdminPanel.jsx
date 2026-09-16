@@ -84,6 +84,7 @@ export default function AdminPanel({ onBackToSite }) {
     email: '',
     github: '',
     linkedin: '',
+    avatar_url: '',
     summary: '',
     years_experience: ''
   });
@@ -135,8 +136,26 @@ export default function AdminPanel({ onBackToSite }) {
   // File upload loading states
   const [uploadingProjectImg, setUploadingProjectImg] = useState(false);
   const [uploadingSkillIcon, setUploadingSkillIcon] = useState(false);
+  const [uploadingProfileImg, setUploadingProfileImg] = useState(false);
 
   // File upload handlers
+  const handleProfileFileSelect = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    setUploadingProfileImg(true);
+    try {
+      const res = await uploadAdminFile(file);
+      if (res.url) {
+        setProfileForm(prev => ({ ...prev, avatar_url: res.url }));
+        showToast('Profile picture uploaded! Remember to click "Save Profile Changes".');
+      }
+    } catch (err) {
+      showToast('Profile image upload failed: ' + err.message);
+    } finally {
+      setUploadingProfileImg(false);
+    }
+  };
+
   const handleProjectFileSelect = async (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
@@ -839,6 +858,100 @@ export default function AdminPanel({ onBackToSite }) {
                 <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <User size={20} color="#ef4444" /> Personal Profile Details
                 </h3>
+
+                {/* Profile Avatar Image Update Section */}
+                <div
+                  style={{
+                    marginBottom: '2rem',
+                    padding: '1.25rem 1.5rem',
+                    borderRadius: '1rem',
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1.5rem',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <div style={{ position: 'relative' }}>
+                    <img
+                      src={profileForm.avatar_url || '/images/roshan-profile-round.png'}
+                      alt="Current Profile Avatar"
+                      style={{
+                        width: '90px',
+                        height: '90px',
+                        borderRadius: '50%',
+                        objectFit: 'cover',
+                        border: '3px solid var(--accent-primary)',
+                        boxShadow: '0 0 20px rgba(239, 68, 68, 0.35)',
+                        background: 'var(--bg-card)',
+                      }}
+                      onError={(e) => {
+                        e.target.src = '/images/roshan-profile-round.png';
+                      }}
+                    />
+                    {uploadingProfileImg && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          borderRadius: '50%',
+                          background: 'rgba(0, 0, 0, 0.7)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#ffffff',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        Uploading...
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{ flex: 1, minWidth: '240px' }}>
+                    <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.3rem' }}>
+                      Profile Picture / Avatar Image
+                    </label>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
+                      Upload a new photo from your device or paste an image URL. Saved directly into SQLite DB and updated across the live portfolio.
+                    </p>
+
+                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                      <label
+                        className="btn btn-secondary"
+                        style={{
+                          cursor: 'pointer',
+                          padding: '0.55rem 1rem',
+                          fontSize: '0.82rem',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                          margin: 0,
+                        }}
+                      >
+                        <Upload size={16} />
+                        {uploadingProfileImg ? 'Uploading...' : 'Choose Image from Device'}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleProfileFileSelect}
+                          style={{ display: 'none' }}
+                          disabled={uploadingProfileImg}
+                        />
+                      </label>
+
+                      <input
+                        type="text"
+                        placeholder="Or paste Image URL (/images/avatar.png or https://...)"
+                        value={profileForm.avatar_url || ''}
+                        onChange={(e) => setProfileForm({ ...profileForm, avatar_url: e.target.value })}
+                        style={{ ...inputStyle, flex: 1, minWidth: '200px' }}
+                      />
+                    </div>
+                  </div>
+                </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
                   <div>
