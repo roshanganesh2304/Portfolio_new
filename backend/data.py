@@ -167,19 +167,85 @@ SKILLS = {
             "name": "BLoC Pattern",
             "level": 90,
             "category": "State Management",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg"
+            "icon_url": "/images/bloc.png"
+        },
+        {
+            "name": "Bloc",
+            "level": 90,
+            "category": "State Management",
+            "icon_url": "/images/bloc.png"
         },
         {
             "name": "Riverpod",
             "level": 88,
             "category": "State Management",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg"
+            "icon_url": "/images/riverpod.png"
+        },
+        {
+            "name": "Xcode",
+            "level": 85,
+            "category": "Mobile & Tools",
+            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/xcode/xcode-original.svg"
+        },
+        {
+            "name": "REST APIs",
+            "level": 92,
+            "category": "Backend & Integration",
+            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg"
+        },
+        {
+            "name": "Clean Architecture",
+            "level": 90,
+            "category": "Architecture & Patterns",
+            "icon_url": "/images/bloc.png"
+        },
+        {
+            "name": "Play Store",
+            "level": 88,
+            "category": "Deployment & Publishing",
+            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
+        },
+        {
+            "name": "AppStore",
+            "level": 88,
+            "category": "Deployment & Publishing",
+            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apple/apple-original.svg"
+        },
+        {
+            "name": "Git",
+            "level": 92,
+            "category": "Tools & Version Control",
+            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg"
+        },
+        {
+            "name": "Google Maps",
+            "level": 88,
+            "category": "APIs & Services",
+            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
+        },
+        {
+            "name": "Product Design",
+            "level": 85,
+            "category": "UI/UX & Design",
+            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg"
+        },
+        {
+            "name": "Payment Integration",
+            "level": 88,
+            "category": "Services & APIs",
+            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/woocommerce/woocommerce-original.svg"
+        },
+        {
+            "name": "Postman",
+            "level": 90,
+            "category": "Tools & Testing",
+            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postman/postman-original.svg"
         },
         {
             "name": "Provider",
             "level": 92,
             "category": "State Management",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg"
+            "icon_url": "/images/bloc.png"
         },
         {
             "name": "GetX",

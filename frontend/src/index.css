@@ -258,3 +258,35 @@ h1, h2, h3, h4, h5, h6 {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Scrollable tech pills container */
+.tech-scroll-container {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  margin-bottom: 1.15rem;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(239, 68, 68, 0.35) rgba(255, 255, 255, 0.02);
+}
+
+.tech-scroll-container::-webkit-scrollbar {
+  height: 5px;
+  width: 5px;
+}
+
+.tech-scroll-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+}
+
+.tech-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(239, 68, 68, 0.35);
+  border-radius: 4px;
+}
+
+.tech-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(239, 68, 68, 0.7);
+}

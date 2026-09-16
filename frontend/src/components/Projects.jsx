@@ -27,8 +27,16 @@ export default function Projects({ projects }) {
 
   const categories = ['All', 'Mobile App', 'Full-Stack Web', 'AI & Python'];
 
+  const getCategoryPriority = (catStr) => {
+    const cat = (catStr || '').toLowerCase();
+    if (cat.includes('mobile') || cat.includes('app')) return 1;
+    if (cat.includes('ai') || cat.includes('python')) return 2;
+    if (cat.includes('web') || cat.includes('full-stack') || cat.includes('fullstack')) return 3;
+    return 4;
+  };
+
   const filteredProjects = activeTab === 'All'
-    ? projects
+    ? [...projects].sort((a, b) => getCategoryPriority(a.category) - getCategoryPriority(b.category))
     : projects.filter(p => p.category.toLowerCase().includes(activeTab.toLowerCase()));
 
   const handleScrollLeft = () => {
@@ -242,28 +250,25 @@ export default function Projects({ projects }) {
                 </div>
 
                 <div>
-                  {/* Tech Stack Pills */}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '1.15rem' }}>
-                    {project.technologies.slice(0, 4).map(tech => (
+                  {/* Tech Stack Pills - Scrollable */}
+                  <div className="tech-scroll-container">
+                    {project.technologies.map(tech => (
                       <span
                         key={tech}
                         style={{
-                          padding: '0.25rem 0.6rem',
+                          padding: '0.25rem 0.65rem',
                           borderRadius: '6px',
                           background: 'rgba(255, 255, 255, 0.04)',
                           border: '1px solid var(--border-color)',
                           fontSize: '0.76rem',
                           color: 'var(--text-primary)',
+                          whiteSpace: 'nowrap',
+                          flexShrink: 0,
                         }}
                       >
                         {tech}
                       </span>
                     ))}
-                    {project.technologies.length > 4 && (
-                      <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)', alignSelf: 'center' }}>
-                        +{project.technologies.length - 4} more
-                      </span>
-                    )}
                   </div>
 
                   {/* Action Footer */}
@@ -415,19 +420,29 @@ export default function Projects({ projects }) {
 
                     {/* Tech Badges */}
                     <div style={{ marginBottom: '2rem' }}>
-                      <h4 style={{ fontSize: '1.05rem', marginBottom: '0.75rem', color: 'var(--text-primary)' }}>Technologies Used</h4>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      <h4 style={{ fontSize: '1.05rem', marginBottom: '0.75rem', color: 'var(--text-primary)' }}>Technologies & Skills Used</h4>
+                      <div
+                        className="tech-scroll-container"
+                        style={{
+                          paddingBottom: '0.5rem',
+                          maxHeight: '140px',
+                          overflowY: 'auto',
+                          flexWrap: 'wrap',
+                          gap: '0.5rem',
+                        }}
+                      >
                         {selectedProject.technologies.map(t => (
                           <span
                             key={t}
                             style={{
                               padding: '0.35rem 0.85rem',
                               borderRadius: '8px',
-                              background: 'rgba(99, 102, 241, 0.12)',
-                              border: '1px solid rgba(99, 102, 241, 0.25)',
+                              background: 'rgba(239, 68, 68, 0.12)',
+                              border: '1px solid rgba(239, 68, 68, 0.25)',
                               fontSize: '0.85rem',
                               color: 'var(--accent-primary)',
                               fontWeight: 600,
+                              whiteSpace: 'nowrap',
                             }}
                           >
                             {t}

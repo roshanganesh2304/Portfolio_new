@@ -18,9 +18,9 @@ export default function Footer({ profile }) {
       }}
     >
       <div className="container">
-        
+
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '3rem', marginBottom: '3rem' }}>
-          
+
           {/* Brand Info */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem' }}>
@@ -123,9 +123,9 @@ export default function Footer({ profile }) {
               </a>
             </div>
 
-            <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+            {/* <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
               Built with Python (FastAPI), React, & Vanilla CSS
-            </div>
+            </div> */}
           </div>
 
         </div>

@@ -135,9 +135,29 @@ export default function Education({ educationData }) {
                     <MapPin size={14} color="#06b6d4" /> {cert.location}
                   </div>
 
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.6 }}>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: cert.credential_url ? '0.75rem' : '0' }}>
                     {cert.description}
                   </p>
+
+                  {cert.credential_url && (
+                    <a
+                      href={cert.credential_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        fontSize: '0.82rem',
+                        color: 'var(--accent-primary)',
+                        fontWeight: 600,
+                        textDecoration: 'none',
+                      }}
+                    >
+                      <span>Verify Credential</span>
+                      <ExternalLink size={13} />
+                    </a>
+                  )}
                 </motion.div>
               ))}
             </div>

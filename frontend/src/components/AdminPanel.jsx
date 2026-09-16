@@ -19,7 +19,12 @@ import {
   Eye,
   EyeOff,
   Upload,
-  Reply
+  Reply,
+  Award,
+  GripVertical,
+  ChevronUp,
+  ChevronDown,
+  Search
 } from 'lucide-react';
 import {
   fetchProfile,
@@ -33,11 +38,17 @@ import {
   deleteAdminExperience,
   saveAdminSkill,
   deleteAdminSkill,
+  reorderAdminSkills,
+  saveAdminSoftSkill,
+  deleteAdminSoftSkill,
   fetchContactMessages,
   deleteContactMessage,
   adminLogin,
   adminForgotPassword,
-  uploadAdminFile
+  uploadAdminFile,
+  fetchCertifications,
+  saveAdminCertification,
+  deleteAdminCertification
 } from '../services/api';
 
 export default function AdminPanel({ onBackToSite }) {
@@ -73,7 +84,8 @@ export default function AdminPanel({ onBackToSite }) {
     email: '',
     github: '',
     linkedin: '',
-    summary: ''
+    summary: '',
+    years_experience: ''
   });
 
   const [projectsList, setProjectsList] = useState([]);
@@ -103,8 +115,22 @@ export default function AdminPanel({ onBackToSite }) {
   });
 
   const [skillsData, setSkillsData] = useState([]);
-  const [newSkill, setNewSkill] = useState({ name: '', level: 85, category: 'Technical', icon_url: '' });
+  const [softSkillsData, setSoftSkillsData] = useState([]);
+  const [draggedSkillIndex, setDraggedSkillIndex] = useState(null);
+  const [skillSearchQuery, setSkillSearchQuery] = useState('');
+  const [newSkill, setNewSkill] = useState({ name: '', level: 85, category: 'Mobile & Cross-Platform', icon_url: '' });
+  const [newSoftSkill, setNewSoftSkill] = useState('');
   const [messages, setMessages] = useState([]);
+  const [certificationsList, setCertificationsList] = useState([]);
+  const [certForm, setCertForm] = useState({
+    id: '',
+    title: '',
+    organization: '',
+    location: '',
+    description: '',
+    issue_date: '',
+    credential_url: ''
+  });
 
   // File upload loading states
   const [uploadingProjectImg, setUploadingProjectImg] = useState(false);
@@ -202,19 +228,24 @@ export default function AdminPanel({ onBackToSite }) {
   const loadAllData = async () => {
     setLoading(true);
     try {
-      const [prof, exp, proj, skill, msgs] = await Promise.all([
+      const [prof, exp, proj, skill, msgs, certs] = await Promise.all([
         fetchProfile(),
         fetchExperience(),
         fetchProjects(),
         fetchSkills(),
-        fetchContactMessages().catch(() => ({ total: 0, messages: [] }))
+        fetchContactMessages().catch(() => ({ total: 0, messages: [] })),
+        fetchCertifications().catch(() => [])
       ]);
 
       if (prof) setProfileForm(prof);
       if (exp) setExperienceList(exp);
       if (proj) setProjectsList(proj);
-      if (skill && skill.technical) setSkillsData(skill.technical);
+      if (skill) {
+        if (skill.technical) setSkillsData(skill.technical);
+        if (skill.soft) setSoftSkillsData(skill.soft);
+      }
       if (msgs && msgs.messages) setMessages(msgs.messages);
+      if (certs) setCertificationsList(certs);
     } catch (err) {
       console.error('Error loading admin data:', err);
     } finally {
@@ -295,16 +326,15 @@ export default function AdminPanel({ onBackToSite }) {
         ...expForm,
         highlights: typeof expForm.highlights === 'string'
           ? expForm.highlights.split('\n').filter(Boolean)
-          : expForm.highlights,
+          : (expForm.highlights || []),
         technologies: typeof expForm.technologies === 'string'
           ? expForm.technologies.split(',').map(s => s.trim()).filter(Boolean)
-          : expForm.technologies
+          : (expForm.technologies || [])
       };
       const res = await saveAdminExperience(payload);
       if (res.experience) setExperienceList(res.experience);
-      setEditingExp(null);
       setExpForm({ id: '', role: '', company: '', period: '', location: '', description: '', highlights: '', technologies: '' });
-      showToast('Experience updated successfully!');
+      showToast('Experience saved successfully!');
     } catch (err) {
       showToast('Failed to save experience: ' + err.message);
     } finally {
@@ -327,10 +357,23 @@ export default function AdminPanel({ onBackToSite }) {
     e.preventDefault();
     if (!newSkill.name) return;
     try {
-      const res = await saveAdminSkill(newSkill);
-      if (res.skills && res.skills.technical) setSkillsData(res.skills.technical);
-      setNewSkill({ name: '', level: 85, category: 'Technical' });
-      showToast('Skill added');
+      if (newSkill.category === 'Soft Skill') {
+        const res = await saveAdminSoftSkill(newSkill.name);
+        if (res.skills) {
+          if (res.skills.technical) setSkillsData(res.skills.technical);
+          if (res.skills.soft) setSoftSkillsData(res.skills.soft);
+        }
+        setNewSkill({ name: '', level: 85, category: 'Soft Skill', icon_url: '' });
+        showToast('Soft skill added');
+      } else {
+        const res = await saveAdminSkill(newSkill);
+        if (res.skills) {
+          if (res.skills.technical) setSkillsData(res.skills.technical);
+          if (res.skills.soft) setSoftSkillsData(res.skills.soft);
+        }
+        setNewSkill({ name: '', level: 85, category: newSkill.category, icon_url: '' });
+        showToast('Technical skill added');
+      }
     } catch (err) {
       showToast('Add skill failed: ' + err.message);
     }
@@ -339,10 +382,86 @@ export default function AdminPanel({ onBackToSite }) {
   const handleDeleteSkill = async (name) => {
     try {
       const res = await deleteAdminSkill(name);
-      if (res.skills && res.skills.technical) setSkillsData(res.skills.technical);
+      if (res.skills) {
+        if (res.skills.technical) setSkillsData(res.skills.technical);
+        if (res.skills.soft) setSoftSkillsData(res.skills.soft);
+      }
       showToast('Skill deleted');
     } catch (err) {
       showToast('Delete skill failed: ' + err.message);
+    }
+  };
+
+  const handleReorderSkills = async (newSkillsList) => {
+    setSkillsData(newSkillsList);
+    try {
+      const names = newSkillsList.map(s => s.name);
+      const res = await reorderAdminSkills(names);
+      if (res.skills && res.skills.technical) {
+        setSkillsData(res.skills.technical);
+      }
+      showToast('Skill sequence updated!');
+    } catch (err) {
+      showToast('Reorder skills failed: ' + err.message);
+    }
+  };
+
+  const handleMoveSkill = (index, direction) => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= skillsData.length) return;
+    const updated = [...skillsData];
+    const [movedItem] = updated.splice(index, 1);
+    updated.splice(targetIndex, 0, movedItem);
+    handleReorderSkills(updated);
+  };
+
+  const handleSkillDragStart = (e, index) => {
+    setDraggedSkillIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index.toString());
+  };
+
+  const handleSkillDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleSkillDrop = (e, dropIndex) => {
+    e.preventDefault();
+    if (draggedSkillIndex === null || draggedSkillIndex === dropIndex) return;
+    const updated = [...skillsData];
+    const [draggedItem] = updated.splice(draggedSkillIndex, 1);
+    updated.splice(dropIndex, 0, draggedItem);
+    setDraggedSkillIndex(null);
+    handleReorderSkills(updated);
+  };
+
+  const handleAddSoftSkill = async (e) => {
+    e.preventDefault();
+    if (!newSoftSkill.trim()) return;
+    try {
+      const res = await saveAdminSoftSkill(newSoftSkill.trim());
+      if (res.skills) {
+        if (res.skills.technical) setSkillsData(res.skills.technical);
+        if (res.skills.soft) setSoftSkillsData(res.skills.soft);
+      }
+      setNewSoftSkill('');
+      showToast('Soft skill added');
+    } catch (err) {
+      showToast('Add soft skill failed: ' + err.message);
+    }
+  };
+
+  const handleDeleteSoftSkill = async (name) => {
+    try {
+      const res = await deleteAdminSoftSkill(name);
+      if (res.skills) {
+        if (res.skills.technical) setSkillsData(res.skills.technical);
+        if (res.skills.soft) setSoftSkillsData(res.skills.soft);
+      }
+      showToast('Soft skill deleted');
+    } catch (err) {
+      showToast('Delete soft skill failed: ' + err.message);
     }
   };
 
@@ -354,6 +473,32 @@ export default function AdminPanel({ onBackToSite }) {
       showToast('Message deleted');
     } catch (err) {
       showToast('Delete message failed: ' + err.message);
+    }
+  };
+
+  const handleSaveCertification = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const res = await saveAdminCertification(certForm);
+      if (res.certifications) setCertificationsList(res.certifications);
+      setCertForm({ id: '', title: '', organization: '', location: '', description: '', issue_date: '', credential_url: '' });
+      showToast('Certification saved successfully!');
+    } catch (err) {
+      showToast('Failed to save certification: ' + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteCertification = async (id) => {
+    if (!window.confirm('Delete this certification?')) return;
+    try {
+      const res = await deleteAdminCertification(id);
+      if (res.certifications) setCertificationsList(res.certifications);
+      showToast('Certification deleted');
+    } catch (err) {
+      showToast('Delete certification failed: ' + err.message);
     }
   };
 
@@ -648,6 +793,7 @@ export default function AdminPanel({ onBackToSite }) {
             { id: 'projects', label: `Projects (${projectsList.length})`, icon: FolderPlus },
             { id: 'experience', label: `Experience (${experienceList.length})`, icon: Briefcase },
             { id: 'skills', label: `Skills (${skillsData.length})`, icon: Wrench },
+            { id: 'certifications', label: `Certificates (${certificationsList.length})`, icon: Award },
             { id: 'messages', label: `Messages (${messages.length})`, icon: Mail },
           ].map((tab) => {
             const Icon = tab.icon;
@@ -765,6 +911,33 @@ export default function AdminPanel({ onBackToSite }) {
                       onChange={(e) => setProfileForm({ ...profileForm, linkedin: e.target.value })}
                       style={inputStyle}
                     />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.4rem', fontWeight: 600 }}>Years of Experience</label>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <input
+                        type="text"
+                        placeholder="e.g. 1+ or 2 Years"
+                        value={profileForm.years_experience || ''}
+                        onChange={(e) => setProfileForm({ ...profileForm, years_experience: e.target.value })}
+                        style={{ ...inputStyle, flex: 1 }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const count = experienceList.length || 1;
+                          const autoVal = `${count}+`;
+                          setProfileForm({ ...profileForm, years_experience: autoVal });
+                          showToast(`Auto-set Years Experience: ${autoVal}`);
+                        }}
+                        className="btn btn-secondary"
+                        style={{ fontSize: '0.78rem', padding: '0.5rem 0.8rem', whiteSpace: 'nowrap' }}
+                        title="Auto-calculate from experience records"
+                      >
+                        Auto-Calculate
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -1066,9 +1239,20 @@ export default function AdminPanel({ onBackToSite }) {
                     />
                   </div>
 
-                  <button type="submit" disabled={saving} className="btn btn-primary">
-                    <Save size={16} /> Save Experience
-                  </button>
+                  <div style={{ display: 'flex', gap: '0.75rem' }}>
+                    <button type="submit" disabled={saving} className="btn btn-primary">
+                      <Save size={16} /> Save Experience
+                    </button>
+                    {expForm.id && (
+                      <button
+                        type="button"
+                        onClick={() => setExpForm({ id: '', role: '', company: '', period: '', location: '', description: '', highlights: '', technologies: '' })}
+                        className="btn btn-secondary"
+                      >
+                        Cancel Edit
+                      </button>
+                    )}
+                  </div>
                 </form>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -1105,7 +1289,18 @@ export default function AdminPanel({ onBackToSite }) {
                     />
                   </div>
 
-                  <div style={{ width: '120px' }}>
+                  <div style={{ width: '170px' }}>
+                    <label style={{ display: 'block', fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '0.3rem', fontWeight: 600 }}>Category</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. State Management"
+                      value={newSkill.category}
+                      onChange={(e) => setNewSkill({ ...newSkill, category: e.target.value })}
+                      style={inputStyle}
+                    />
+                  </div>
+
+                  <div style={{ width: '110px' }}>
                     <label style={{ display: 'block', fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '0.3rem', fontWeight: 600 }}>Proficiency (%)</label>
                     <input
                       type="number"
@@ -1164,21 +1359,340 @@ export default function AdminPanel({ onBackToSite }) {
                   </button>
                 </form>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem' }}>
-                  {skillsData.map((s) => (
-                    <div key={s.name} className="glass-card" style={{ padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        {s.icon_url && <img src={s.icon_url} width="18" height="18" alt={s.name} />}
-                        <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{s.name}</span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
+                  <div style={{ position: 'relative', flex: 1, minWidth: '240px', maxWidth: '400px' }}>
+                    <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                    <input
+                      type="text"
+                      placeholder="Search skills by name or category..."
+                      value={skillSearchQuery}
+                      onChange={(e) => setSkillSearchQuery(e.target.value)}
+                      style={{
+                        ...inputStyle,
+                        paddingLeft: '2.4rem',
+                        fontSize: '0.85rem'
+                      }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                    <span style={{ fontWeight: 600 }}>
+                      Showing {skillsData.filter(s => (s.name || '').toLowerCase().includes(skillSearchQuery.toLowerCase()) || (s.category || '').toLowerCase().includes(skillSearchQuery.toLowerCase())).length} of {skillsData.length} skills
+                    </span>
+                  </div>
+                </div>
+
+                {skillsData.filter(s => (s.name || '').toLowerCase().includes(skillSearchQuery.toLowerCase()) || (s.category || '').toLowerCase().includes(skillSearchQuery.toLowerCase())).length === 0 ? (
+                  <div className="glass-card" style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--text-muted)', marginBottom: '2rem' }}>
+                    No skills found matching "{skillSearchQuery}".
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+                    {skillsData
+                      .filter(s => (s.name || '').toLowerCase().includes(skillSearchQuery.toLowerCase()) || (s.category || '').toLowerCase().includes(skillSearchQuery.toLowerCase()))
+                      .map((s) => {
+                        const idx = skillsData.findIndex(item => item.name === s.name);
+                        return (
+                          <div
+                            key={s.name}
+                            draggable
+                            onDragStart={(e) => handleSkillDragStart(e, idx)}
+                            onDragOver={handleSkillDragOver}
+                            onDrop={(e) => handleSkillDrop(e, idx)}
+                            onDragEnd={() => setDraggedSkillIndex(null)}
+                            className="glass-card"
+                            style={{
+                              padding: '0.85rem 1.1rem',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justify: 'space-between',
+                              cursor: 'grab',
+                              border: draggedSkillIndex === idx ? '2px dashed var(--accent-primary)' : '1px solid rgba(255, 255, 255, 0.08)',
+                              background: draggedSkillIndex === idx ? 'rgba(99, 102, 241, 0.15)' : undefined,
+                              transition: 'all 0.2s ease',
+                              opacity: draggedSkillIndex === idx ? 0.6 : 1
+                            }}
+                          >
+                            {/* Left: Icon + Skill Name & Category */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0, flex: 1, paddingRight: '0.5rem' }}>
+                              {/* Icon Box Container */}
+                              <div
+                                style={{
+                                  width: '36px',
+                                  height: '36px',
+                                  borderRadius: '10px',
+                                  background: 'rgba(255, 255, 255, 0.05)',
+                                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justify: 'center',
+                                  flexShrink: 0,
+                                  overflow: 'hidden'
+                                }}
+                              >
+                                {s.icon_url ? (
+                                  <img
+                                    src={s.icon_url}
+                                    alt={s.name}
+                                    style={{
+                                      width: '20px',
+                                      height: '20px',
+                                      objectFit: 'contain',
+                                      display: 'block',
+                                      margin: 'auto'
+                                    }}
+                                  />
+                                ) : (
+                                  <Wrench size={16} color="var(--accent-primary)" />
+                                )}
+                              </div>
+
+                              {/* Title and Category */}
+                              <div style={{ minWidth: 0, flex: 1 }}>
+                                <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                  {s.name}
+                                </div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                  {s.category}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Right: Proficiency % Badge + Action Buttons */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexShrink: 0 }}>
+                              <span style={{
+                                fontSize: '0.78rem',
+                                color: '#ef4444',
+                                fontWeight: 700,
+                                padding: '0.2rem 0.55rem',
+                                borderRadius: '6px',
+                                background: 'rgba(239, 68, 68, 0.12)',
+                                border: '1px solid rgba(239, 68, 68, 0.25)',
+                                marginRight: '0.15rem',
+                                fontFamily: 'monospace'
+                              }}>
+                                {s.level}%
+                              </span>
+
+                              <button
+                                type="button"
+                                onClick={() => handleMoveSkill(idx, 'up')}
+                                disabled={idx === 0}
+                                title="Move Up"
+                                style={{
+                                  background: 'rgba(255, 255, 255, 0.06)',
+                                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                                  color: idx === 0 ? 'var(--text-muted)' : 'var(--text-primary)',
+                                  borderRadius: '6px',
+                                  cursor: idx === 0 ? 'not-allowed' : 'pointer',
+                                  padding: '4px 6px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  opacity: idx === 0 ? 0.35 : 1
+                                }}
+                              >
+                                <ChevronUp size={14} />
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleMoveSkill(idx, 'down')}
+                                disabled={idx === skillsData.length - 1}
+                                title="Move Down"
+                                style={{
+                                  background: 'rgba(255, 255, 255, 0.06)',
+                                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                                  color: idx === skillsData.length - 1 ? 'var(--text-muted)' : 'var(--text-primary)',
+                                  borderRadius: '6px',
+                                  cursor: idx === skillsData.length - 1 ? 'not-allowed' : 'pointer',
+                                  padding: '4px 6px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  opacity: idx === skillsData.length - 1 ? 0.35 : 1
+                                }}
+                              >
+                                <ChevronDown size={14} />
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteSkill(s.name)}
+                                title="Delete Skill"
+                                style={{
+                                  background: 'rgba(239, 68, 68, 0.1)',
+                                  border: '1px solid rgba(239, 68, 68, 0.2)',
+                                  color: '#ef4444',
+                                  borderRadius: '6px',
+                                  cursor: 'pointer',
+                                  padding: '4px 6px',
+                                  display: 'flex',
+                                  alignItems: 'center'
+                                }}
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+
+                {/* Professional Soft Skills Section with Dedicated Add Form */}
+                <div style={{ marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <h4 style={{ fontSize: '1.05rem', marginBottom: '1rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Award size={18} color="var(--accent-secondary)" /> Professional Soft Skills ({softSkillsData.length})
+                  </h4>
+
+                  <form onSubmit={handleAddSoftSkill} className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.5rem', display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1, minWidth: '220px' }}>
+                      <input
+                        type="text"
+                        placeholder="Enter soft skill (e.g. Leadership, Problem Solving, Adaptability)"
+                        value={newSoftSkill}
+                        onChange={(e) => setNewSoftSkill(e.target.value)}
+                        style={inputStyle}
+                        required
+                      />
+                    </div>
+                    <button type="submit" className="btn btn-primary" style={{ padding: '0.65rem 1.25rem' }}>
+                      <Plus size={16} /> Add Soft Skill
+                    </button>
+                  </form>
+
+                  {softSkillsData.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+                      {softSkillsData.map((ss) => (
+                        <div key={ss} className="glass-card" style={{ padding: '0.55rem 1.1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.88rem' }}>
+                          <span>{ss}</span>
+                          <button onClick={() => handleDeleteSoftSkill(ss)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center' }} title="Delete Soft Skill">
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* 5. CERTIFICATES TAB */}
+            {activeTab === 'certifications' && (
+              <div>
+                <form onSubmit={handleSaveCertification} className="glass-card" style={{ padding: '2rem', marginBottom: '2rem' }}>
+                  <h3 style={{ fontSize: '1.25rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Plus size={20} color="#ef4444" /> {certForm.id ? 'Edit Certificate' : 'Add New Certificate'}
+                  </h3>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.4rem', fontWeight: 600 }}>Certificate Title</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Python-Web Development Certification"
+                        value={certForm.title || ''}
+                        onChange={(e) => setCertForm({ ...certForm, title: e.target.value })}
+                        style={inputStyle}
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.4rem', fontWeight: 600 }}>Issuing Organization</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Luminar Technolab"
+                        value={certForm.organization || ''}
+                        onChange={(e) => setCertForm({ ...certForm, organization: e.target.value })}
+                        style={inputStyle}
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.4rem', fontWeight: 600 }}>Location / Platform</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Calicut, Kerala or Online"
+                        value={certForm.location || ''}
+                        onChange={(e) => setCertForm({ ...certForm, location: e.target.value })}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.4rem', fontWeight: 600 }}>Issue Date / Year</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 2024"
+                        value={certForm.issue_date || ''}
+                        onChange={(e) => setCertForm({ ...certForm, issue_date: e.target.value })}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={{ gridColumn: '1 / -1' }}>
+                      <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.4rem', fontWeight: 600 }}>Credential / Verification Link</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. https://example.com/certificate/123"
+                        value={certForm.credential_url || ''}
+                        onChange={(e) => setCertForm({ ...certForm, credential_url: e.target.value })}
+                        style={inputStyle}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom: '1.25rem' }}>
+                    <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.4rem', fontWeight: 600 }}>Description / Details</label>
+                    <textarea
+                      rows={3}
+                      value={certForm.description || ''}
+                      onChange={(e) => setCertForm({ ...certForm, description: e.target.value })}
+                      style={{ ...inputStyle, resize: 'vertical' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '0.75rem' }}>
+                    <button type="submit" disabled={saving} className="btn btn-primary">
+                      <Save size={16} /> Save Certificate
+                    </button>
+                    {certForm.id && (
+                      <button
+                        type="button"
+                        onClick={() => setCertForm({ id: '', title: '', organization: '', location: '', description: '', issue_date: '', credential_url: '' })}
+                        className="btn btn-secondary"
+                      >
+                        Cancel Edit
+                      </button>
+                    )}
+                  </div>
+                </form>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {certificationsList.map((c) => (
+                    <div key={c.id} className="glass-card" style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                      <div style={{ flex: 1, minWidth: '240px' }}>
+                        <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>{c.title}</div>
+                        <div style={{ fontSize: '0.85rem', color: 'var(--accent-primary)', fontWeight: 600 }}>{c.organization} {c.location ? `• ${c.location}` : ''} {c.issue_date ? `(${c.issue_date})` : ''}</div>
+                        {c.description && <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.3rem' }}>{c.description}</div>}
+                        {c.credential_url && (
+                          <a href={c.credential_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.8rem', color: '#60a5fa', textDecoration: 'underline', marginTop: '0.3rem', display: 'inline-block' }}>
+                            View Credential
+                          </a>
+                        )}
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--accent-primary)', fontWeight: 700 }}>{s.level}%</span>
-                        <button onClick={() => handleDeleteSkill(s.name)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '2px' }}>
-                          <Trash2 size={15} />
-                        </button>
+
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button onClick={() => setCertForm(c)} className="btn btn-secondary" style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem' }}>Edit</button>
+                        <button onClick={() => handleDeleteCertification(c.id)} style={{ padding: '0.45rem 0.85rem', borderRadius: '9999px', background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', cursor: 'pointer', fontSize: '0.8rem' }}>Delete</button>
                       </div>
                     </div>
                   ))}
+                  {certificationsList.length === 0 && (
+                    <div style={{ textTransform: 'uppercase', fontSize: '0.85rem', color: 'var(--text-muted)', textAlign: 'center', padding: '3rem 0' }}>
+                      No certifications added yet.
+                    </div>
+                  )}
                 </div>
               </div>
             )}

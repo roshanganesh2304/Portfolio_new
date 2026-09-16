@@ -20,12 +20,18 @@ try:
         db_get_skills,
         db_save_skill,
         db_delete_skill,
+        db_reorder_skills,
         db_add_contact_message,
         db_get_contact_messages,
         db_delete_contact_message,
         db_get_admin,
         db_verify_admin_login,
-        db_update_admin_password
+        db_update_admin_password,
+        db_get_certifications,
+        db_save_certification,
+        db_delete_certification,
+        db_save_soft_skill,
+        db_delete_soft_skill
     )
 except ModuleNotFoundError:
     from database import (
@@ -41,12 +47,18 @@ except ModuleNotFoundError:
         db_get_skills,
         db_save_skill,
         db_delete_skill,
+        db_reorder_skills,
         db_add_contact_message,
         db_get_contact_messages,
         db_delete_contact_message,
         db_get_admin,
         db_verify_admin_login,
-        db_update_admin_password
+        db_update_admin_password,
+        db_get_certifications,
+        db_save_certification,
+        db_delete_certification,
+        db_save_soft_skill,
+        db_delete_soft_skill
     )
 
 app = FastAPI(
@@ -119,13 +131,17 @@ def get_skills():
 @app.get("/api/education")
 def get_education():
     try:
-        from backend.data import EDUCATION, CERTIFICATIONS
+        from backend.data import EDUCATION
     except ModuleNotFoundError:
-        from data import EDUCATION, CERTIFICATIONS
+        from data import EDUCATION
     return {
         "education": EDUCATION,
-        "certifications": CERTIFICATIONS
+        "certifications": db_get_certifications()
     }
+
+@app.get("/api/certifications")
+def get_certifications():
+    return db_get_certifications()
 
 @app.post("/api/contact", response_model=ContactResponse, status_code=status.HTTP_201_CREATED)
 def submit_contact_form(payload: ContactFormRequest):
@@ -245,6 +261,7 @@ class ProfileUpdateRequest(BaseModel):
     linkedin: Optional[str] = None
     github: Optional[str] = None
     summary: Optional[str] = None
+    years_experience: Optional[str] = None
 
 @app.put("/api/admin/profile")
 def update_admin_profile(payload: ProfileUpdateRequest):
@@ -284,10 +301,10 @@ class ExperienceModel(BaseModel):
     id: Optional[str] = None
     role: str
     company: str
-    period: str
-    location: str
+    period: Optional[str] = ""
+    location: Optional[str] = ""
     is_current: bool = False
-    description: str
+    description: Optional[str] = ""
     highlights: List[str] = []
     technologies: List[str] = []
 
@@ -320,8 +337,50 @@ def add_or_update_skill(skill: SkillModel):
 
 @app.delete("/api/admin/skills/{skill_name}")
 def delete_skill(skill_name: str):
-    db_delete_skill(skill_name)
-    skills = db_get_skills()
+    skills = db_delete_skill(skill_name)
     return {"status": "deleted", "skills": skills}
+
+class ReorderSkillsRequest(BaseModel):
+    ordered_names: List[str]
+
+@app.post("/api/admin/skills/reorder")
+def reorder_skills(payload: ReorderSkillsRequest):
+    skills = db_reorder_skills(payload.ordered_names)
+    return {"status": "success", "skills": skills}
+
+class SoftSkillModel(BaseModel):
+    name: str
+
+@app.post("/api/admin/soft-skills")
+def add_soft_skill(payload: SoftSkillModel):
+    skills = db_save_soft_skill(payload.name)
+    return {"status": "success", "skills": skills}
+
+@app.delete("/api/admin/soft-skills/{name}")
+def delete_soft_skill(name: str):
+    skills = db_delete_soft_skill(name)
+    return {"status": "deleted", "skills": skills}
+
+class CertificationModel(BaseModel):
+    id: Optional[str] = None
+    title: str
+    organization: str
+    location: Optional[str] = ""
+    description: Optional[str] = ""
+    issue_date: Optional[str] = ""
+    credential_url: Optional[str] = ""
+
+@app.post("/api/admin/certifications")
+def add_or_update_certification(cert: CertificationModel):
+    cert_dict = cert.dict()
+    if not cert_dict.get("id"):
+        cert_dict["id"] = cert_dict["title"].lower().replace(" ", "-") + "-" + str(int(time.time()))
+    certs = db_save_certification(cert_dict)
+    return {"status": "success", "certifications": certs}
+
+@app.delete("/api/admin/certifications/{cert_id}")
+def delete_certification(cert_id: str):
+    certs = db_delete_certification(cert_id)
+    return {"status": "deleted", "certifications": certs}
 
 

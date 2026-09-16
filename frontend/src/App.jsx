@@ -57,6 +57,15 @@ export default function App() {
         ]);
 
         setProfile(profData);
+        if (profData?.avatar_url) {
+          const faviconLink = document.querySelector("link[rel*='icon']");
+          if (faviconLink) {
+            faviconLink.href = profData.avatar_url.includes('roshan-profile.png') 
+              ? '/images/roshan-profile-round.png' 
+              : profData.avatar_url;
+            faviconLink.type = 'image/png';
+          }
+        }
         setExperience(expData);
         setProjects(projData);
         setSkills(skillData);
