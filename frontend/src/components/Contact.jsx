@@ -64,7 +64,8 @@ export default function Contact({ profile }) {
         </div>
 
         {/* Form + Sidebar Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem', alignItems: 'start' }}>
+        <div className="contact-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '3rem', alignItems: 'start' }}>
+
           
           {/* Contact Info Sidebar */}
           <motion.div

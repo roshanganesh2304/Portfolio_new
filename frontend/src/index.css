@@ -290,3 +290,115 @@ h1, h2, h3, h4, h5, h6 {
 .tech-scroll-container::-webkit-scrollbar-thumb:hover {
   background: rgba(239, 68, 68, 0.7);
 }
+
+/* ==========================================================================
+   RESPONSIVE DESIGN SYSTEM FOR ALL DEVICES (DESKTOP, TABLET, MOBILE)
+   ========================================================================== */
+
+/* Desktop & Large Screens (min-width: 992px) */
+@media (min-width: 992px) {
+  .desktop-nav {
+    display: flex !important;
+  }
+  .mobile-menu-btn {
+    display: none !important;
+  }
+  .hero-grid {
+    grid-template-columns: 1.15fr 0.85fr !important;
+    text-align: left;
+  }
+}
+
+/* Tablets & Laptops (max-width: 991px) */
+@media (max-width: 991px) {
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+    text-align: center;
+    justify-items: center;
+    gap: 2.5rem !important;
+  }
+  .hero-grid > div:first-child {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .hero-grid p {
+    max-width: 100% !important;
+  }
+}
+
+/* Mobile Devices (max-width: 768px) */
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none !important;
+  }
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+  .container {
+    padding: 0 1rem !important;
+  }
+  .section-padding {
+    padding: 3.5rem 0 !important;
+  }
+  .section-header {
+    margin-bottom: 2.25rem !important;
+    padding: 0 0.5rem !important;
+  }
+  .section-title {
+    font-size: 1.85rem !important;
+  }
+  .subtitle {
+    font-size: 0.95rem !important;
+    line-height: 1.6 !important;
+  }
+
+  /* Glass Card Mobile Adjustments */
+  .glass-card {
+    padding: 1.25rem !important;
+    border-radius: 0.85rem !important;
+  }
+
+  /* Responsive Grid Adjustments */
+  .projects-grid, .contact-grid, .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+
+  /* Responsive Buttons */
+  .btn {
+    padding: 0.7rem 1.25rem !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+/* Small Mobile Phones (max-width: 480px) */
+@media (max-width: 480px) {
+  html, body {
+    overflow-x: hidden !important;
+  }
+  .container {
+    padding: 0 0.85rem !important;
+  }
+  .section-title {
+    font-size: 1.6rem !important;
+  }
+  .section-tag {
+    font-size: 0.72rem !important;
+    padding: 0.25rem 0.75rem !important;
+  }
+  .btn {
+    width: 100% !important;
+  }
+  .glow-orb-1, .glow-orb-2, .glow-orb-3 {
+    width: 260px !important;
+    height: 260px !important;
+    filter: blur(60px) !important;
+  }
+  /* Form input safety */
+  input, textarea, select {
+    font-size: 16px !important; /* Prevents auto-zoom on iOS Safari */
+  }
+}
+

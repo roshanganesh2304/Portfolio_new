@@ -162,7 +162,7 @@ export default function Projects({ projects }) {
               transition={{ duration: 0.4, delay: idx * 0.06 }}
               className="glass-card"
               style={{
-                flex: '0 0 clamp(310px, 82vw, 360px)',
+                flex: '0 0 clamp(270px, 85vw, 360px)',
                 scrollSnapAlign: 'start',
                 display: 'flex',
                 flexDirection: 'column',
