@@ -155,175 +155,193 @@ SKILLS = {
             "name": "Flutter",
             "level": 92,
             "category": "Mobile & Cross-Platform",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg"
+            "icon_url": "/images/icons/flutter.svg"
         },
         {
             "name": "Dart",
             "level": 90,
             "category": "Mobile & Cross-Platform",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dart/dart-original.svg"
-        },
-        {
-            "name": "BLoC Pattern",
-            "level": 90,
-            "category": "State Management",
-            "icon_url": "/images/bloc.png"
-        },
-        {
-            "name": "Bloc",
-            "level": 90,
-            "category": "State Management",
-            "icon_url": "/images/bloc.png"
+            "icon_url": "/images/icons/dart.svg"
         },
         {
             "name": "Riverpod",
             "level": 88,
             "category": "State Management",
-            "icon_url": "/images/riverpod.png"
+            "icon_url": "/images/icons/riverpod.svg"
+        },
+        {
+            "name": "BLoC",
+            "level": 90,
+            "category": "State Management",
+            "icon_url": "/images/icons/bloc.svg"
         },
         {
             "name": "Xcode",
             "level": 85,
             "category": "Mobile & Tools",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/xcode/xcode-original.svg"
-        },
-        {
-            "name": "REST APIs",
-            "level": 92,
-            "category": "Backend & Integration",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg"
+            "icon_url": "/images/icons/xcode.svg"
         },
         {
             "name": "Clean Architecture",
             "level": 90,
             "category": "Architecture & Patterns",
-            "icon_url": "/images/bloc.png"
-        },
-        {
-            "name": "Play Store",
-            "level": 88,
-            "category": "Deployment & Publishing",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
-        },
-        {
-            "name": "AppStore",
-            "level": 88,
-            "category": "Deployment & Publishing",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apple/apple-original.svg"
-        },
-        {
-            "name": "Git",
-            "level": 92,
-            "category": "Tools & Version Control",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg"
-        },
-        {
-            "name": "Google Maps",
-            "level": 88,
-            "category": "APIs & Services",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
-        },
-        {
-            "name": "Product Design",
-            "level": 85,
-            "category": "UI/UX & Design",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg"
-        },
-        {
-            "name": "Payment Integration",
-            "level": 88,
-            "category": "Services & APIs",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/woocommerce/woocommerce-original.svg"
-        },
-        {
-            "name": "Postman",
-            "level": 90,
-            "category": "Tools & Testing",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postman/postman-original.svg"
-        },
-        {
-            "name": "Provider",
-            "level": 92,
-            "category": "State Management",
-            "icon_url": "/images/bloc.png"
-        },
-        {
-            "name": "GetX",
-            "level": 88,
-            "category": "State Management",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg"
-        },
-        {
-            "name": "Python",
-            "level": 94,
-            "category": "Backend & AI",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg"
-        },
-        {
-            "name": "Django / DRF",
-            "level": 90,
-            "category": "Backend & AI",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain.svg"
-        },
-        {
-            "name": "React.js",
-            "level": 88,
-            "category": "Frontend Web",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg"
-        },
-        {
-            "name": "Node.js",
-            "level": 80,
-            "category": "Backend & AI",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg"
+            "icon_url": "/images/icons/clean-architecture.svg"
         },
         {
             "name": "Firebase",
             "level": 88,
             "category": "Cloud & DB",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg"
+            "icon_url": "/images/icons/firebase.svg"
         },
         {
-            "name": "MySQL",
-            "level": 86,
+            "name": "REST APIs",
+            "level": 92,
+            "category": "Backend & Integration",
+            "icon_url": "/images/icons/rest-api.svg"
+        },
+        {
+            "name": "Play Store",
+            "level": 88,
+            "category": "Deployment & Publishing",
+            "icon_url": "/images/icons/play-store.svg"
+        },
+        {
+            "name": "App Store",
+            "level": 88,
+            "category": "Deployment & Publishing",
+            "icon_url": "/images/icons/app-store.svg"
+        },
+        {
+            "name": "Git",
+            "level": 92,
+            "category": "Tools & Version Control",
+            "icon_url": "/images/icons/git.svg"
+        },
+        {
+            "name": "Node.js",
+            "level": 80,
+            "category": "Backend & Integration",
+            "icon_url": "/images/icons/nodejs.svg"
+        },
+        {
+            "name": "React",
+            "level": 88,
+            "category": "Frontend Web",
+            "icon_url": "/images/icons/react.svg"
+        },
+        {
+            "name": "MongoDB",
+            "level": 82,
             "category": "Cloud & DB",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg"
+            "icon_url": "/images/icons/mongodb.svg"
+        },
+        {
+            "name": "Google Maps",
+            "level": 88,
+            "category": "APIs & Services",
+            "icon_url": "/images/icons/google-maps.svg"
+        },
+        {
+            "name": "Google Cloud",
+            "level": 80,
+            "category": "Cloud & Services",
+            "icon_url": "/images/icons/google-cloud.svg"
+        },
+        {
+            "name": "Product Design",
+            "level": 85,
+            "category": "UI/UX & Design",
+            "icon_url": "/images/icons/product-design.svg"
+        },
+        {
+            "name": "Payment Integration",
+            "level": 88,
+            "category": "Services & APIs",
+            "icon_url": "/images/icons/payment-integration.svg"
+        },
+        {
+            "name": "Postman",
+            "level": 90,
+            "category": "Tools & Testing",
+            "icon_url": "/images/icons/postman.svg"
+        },
+        {
+            "name": "System Design",
+            "level": 80,
+            "category": "Architecture & Patterns",
+            "icon_url": "/images/icons/system-design.svg"
+        },
+        {
+            "name": "Python",
+            "level": 94,
+            "category": "Backend & AI",
+            "icon_url": "/images/icons/python.svg"
+        },
+        {
+            "name": "Django / DRF",
+            "level": 90,
+            "category": "Backend & AI",
+            "icon_url": "/images/icons/django.svg"
+        },
+        {
+            "name": "FastAPI",
+            "level": 88,
+            "category": "Backend & AI",
+            "icon_url": "/images/icons/fastapi.svg"
         },
         {
             "name": "JavaScript",
             "level": 90,
             "category": "Frontend Web",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg"
+            "icon_url": "/images/icons/javascript.svg"
         },
         {
             "name": "HTML5",
             "level": 95,
             "category": "Frontend Web",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg"
+            "icon_url": "/images/icons/html5.svg"
         },
         {
             "name": "CSS3",
             "level": 92,
             "category": "Frontend Web",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg"
+            "icon_url": "/images/icons/css3.svg"
         },
         {
             "name": "Bootstrap",
             "level": 85,
             "category": "Frontend Web",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg"
+            "icon_url": "/images/icons/bootstrap.svg"
+        },
+        {
+            "name": "MySQL",
+            "level": 86,
+            "category": "Cloud & DB",
+            "icon_url": "/images/icons/mysql.svg"
+        },
+        {
+            "name": "SQLite",
+            "level": 85,
+            "category": "Cloud & DB",
+            "icon_url": "/images/icons/sqlite.svg"
         },
         {
             "name": "C++",
             "level": 78,
             "category": "Core & Systems",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg"
+            "icon_url": "/images/icons/cplusplus.svg"
         },
         {
             "name": "C",
             "level": 75,
             "category": "Core & Systems",
-            "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg"
+            "icon_url": "/images/icons/c.svg"
+        },
+        {
+            "name": "MS Office",
+            "level": 85,
+            "category": "Tools & Productivity",
+            "icon_url": "/images/icons/ms-office.svg"
         }
     ],
     "soft": [

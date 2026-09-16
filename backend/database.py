@@ -477,6 +477,33 @@ def db_delete_skill(skill_name: str):
     conn.close()
     return db_get_skills()
 
+def db_reset_skills() -> Dict[str, Any]:
+    """Reset skills table in SQLite database to default list from data.py."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM skills;")
+    
+    try:
+        from backend.data import SKILLS
+    except ModuleNotFoundError:
+        from data import SKILLS
+
+    tech_skills = SKILLS.get("technical", [])
+    for idx, s in enumerate(tech_skills):
+        cursor.execute("""
+        INSERT INTO skills (name, level, category, icon_url, order_index)
+        VALUES (?, ?, ?, ?, ?);
+        """, (
+            s["name"],
+            s.get("level", 85),
+            s.get("category", "Technical"),
+            s.get("icon_url", ""),
+            idx + 1
+        ))
+    conn.commit()
+    conn.close()
+    return db_get_skills()
+
 def db_save_soft_skill(name: str) -> Dict[str, Any]:
     conn = get_db_connection()
     conn.execute("INSERT OR IGNORE INTO soft_skills (name) VALUES (?);", (name.strip(),))

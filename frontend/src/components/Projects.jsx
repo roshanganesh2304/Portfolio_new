@@ -8,18 +8,15 @@ export default function Projects({ projects }) {
   const [selectedProject, setSelectedProject] = useState(null);
   const scrollRef = useRef(null);
 
-  // Lock background body & html scroll completely when modal is active
+  // Lock background body scroll cleanly when modal is active
   useEffect(() => {
     if (selectedProject) {
       document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
     }
     return () => {
       document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
     };
   }, [selectedProject]);
 

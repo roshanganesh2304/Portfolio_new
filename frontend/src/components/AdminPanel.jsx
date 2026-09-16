@@ -48,7 +48,8 @@ import {
   uploadAdminFile,
   fetchCertifications,
   saveAdminCertification,
-  deleteAdminCertification
+  deleteAdminCertification,
+  resetAdminSkills
 } from '../services/api';
 
 export default function AdminPanel({ onBackToSite }) {
@@ -422,6 +423,20 @@ export default function AdminPanel({ onBackToSite }) {
       showToast('Skill sequence updated!');
     } catch (err) {
       showToast('Reorder skills failed: ' + err.message);
+    }
+  };
+
+  const handleResetSkills = async () => {
+    if (!window.confirm('Reset and revert all skills to default master list with local SVG icons?')) return;
+    try {
+      const res = await resetAdminSkills();
+      if (res.skills && res.skills.technical) {
+        setSkillsData(res.skills.technical);
+        if (res.skills.soft) setSoftSkillsData(res.skills.soft);
+      }
+      showToast('All skills reverted to master list with SVG icons!');
+    } catch (err) {
+      showToast('Reset skills failed: ' + err.message);
     }
   };
 
@@ -1487,10 +1502,31 @@ export default function AdminPanel({ onBackToSite }) {
                       }}
                     />
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                    <span style={{ fontWeight: 600 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                       Showing {skillsData.filter(s => (s.name || '').toLowerCase().includes(skillSearchQuery.toLowerCase()) || (s.category || '').toLowerCase().includes(skillSearchQuery.toLowerCase())).length} of {skillsData.length} skills
                     </span>
+                    <button
+                      type="button"
+                      onClick={handleResetSkills}
+                      title="Reset all technical skills to default list with local SVG icons"
+                      style={{
+                        padding: '0.5rem 1rem',
+                        borderRadius: '9999px',
+                        background: 'rgba(239, 68, 68, 0.12)',
+                        border: '1px solid rgba(239, 68, 68, 0.3)',
+                        color: 'var(--accent-primary)',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      <RefreshCw size={14} /> Revert / Reset Default Skills
+                    </button>
                   </div>
                 </div>
 

@@ -21,6 +21,7 @@ try:
         db_save_skill,
         db_delete_skill,
         db_reorder_skills,
+        db_reset_skills,
         db_add_contact_message,
         db_get_contact_messages,
         db_delete_contact_message,
@@ -48,6 +49,7 @@ except ModuleNotFoundError:
         db_save_skill,
         db_delete_skill,
         db_reorder_skills,
+        db_reset_skills,
         db_add_contact_message,
         db_get_contact_messages,
         db_delete_contact_message,
@@ -348,6 +350,11 @@ class ReorderSkillsRequest(BaseModel):
 @app.post("/api/admin/skills/reorder")
 def reorder_skills(payload: ReorderSkillsRequest):
     skills = db_reorder_skills(payload.ordered_names)
+    return {"status": "success", "skills": skills}
+
+@app.post("/api/admin/skills/reset")
+def reset_skills():
+    skills = db_reset_skills()
     return {"status": "success", "skills": skills}
 
 class SoftSkillModel(BaseModel):
