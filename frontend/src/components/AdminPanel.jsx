@@ -24,7 +24,8 @@ import {
   GripVertical,
   ChevronUp,
   ChevronDown,
-  Search
+  Search,
+  Pencil
 } from 'lucide-react';
 import {
   fetchProfile,
@@ -121,6 +122,7 @@ export default function AdminPanel({ onBackToSite }) {
   const [draggedSkillIndex, setDraggedSkillIndex] = useState(null);
   const [skillSearchQuery, setSkillSearchQuery] = useState('');
   const [newSkill, setNewSkill] = useState({ name: '', level: 85, category: 'Mobile & Cross-Platform', icon_url: '' });
+  const [editingSkill, setEditingSkill] = useState(null);
   const [newSoftSkill, setNewSoftSkill] = useState('');
   const [messages, setMessages] = useState([]);
   const [certificationsList, setCertificationsList] = useState([]);
@@ -377,6 +379,9 @@ export default function AdminPanel({ onBackToSite }) {
     e.preventDefault();
     if (!newSkill.name) return;
     try {
+      if (editingSkill && editingSkill.toLowerCase() !== newSkill.name.toLowerCase()) {
+        await deleteAdminSkill(editingSkill);
+      }
       if (newSkill.category === 'Soft Skill') {
         const res = await saveAdminSoftSkill(newSkill.name);
         if (res.skills) {
@@ -384,18 +389,21 @@ export default function AdminPanel({ onBackToSite }) {
           if (res.skills.soft) setSoftSkillsData(res.skills.soft);
         }
         setNewSkill({ name: '', level: 85, category: 'Soft Skill', icon_url: '' });
-        showToast('Soft skill added');
+        setEditingSkill(null);
+        showToast('Soft skill saved');
       } else {
         const res = await saveAdminSkill(newSkill);
         if (res.skills) {
           if (res.skills.technical) setSkillsData(res.skills.technical);
           if (res.skills.soft) setSoftSkillsData(res.skills.soft);
         }
-        setNewSkill({ name: '', level: 85, category: newSkill.category, icon_url: '' });
-        showToast('Technical skill added');
+        const updatedMsg = editingSkill ? 'Skill updated successfully!' : 'Skill added successfully!';
+        setNewSkill({ name: '', level: 85, category: newSkill.category || 'Mobile & Cross-Platform', icon_url: '' });
+        setEditingSkill(null);
+        showToast(updatedMsg);
       }
     } catch (err) {
-      showToast('Add skill failed: ' + err.message);
+      showToast('Save skill failed: ' + err.message);
     }
   };
 
@@ -1482,9 +1490,25 @@ export default function AdminPanel({ onBackToSite }) {
                     </div>
                   </div>
 
-                  <button type="submit" className="btn btn-primary" style={{ padding: '0.75rem 1.25rem' }}>
-                    <Plus size={16} /> Add Skill
-                  </button>
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <button type="submit" className="btn btn-primary" style={{ padding: '0.75rem 1.25rem' }}>
+                      {editingSkill ? <Save size={16} /> : <Plus size={16} />}
+                      {editingSkill ? 'Update Skill' : 'Add Skill'}
+                    </button>
+                    {editingSkill && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingSkill(null);
+                          setNewSkill({ name: '', level: 85, category: 'Mobile & Cross-Platform', icon_url: '' });
+                        }}
+                        className="btn btn-secondary"
+                        style={{ padding: '0.75rem 1.1rem' }}
+                      >
+                        Cancel Edit
+                      </button>
+                    )}
+                  </div>
                 </form>
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
@@ -1555,8 +1579,8 @@ export default function AdminPanel({ onBackToSite }) {
                               alignItems: 'center',
                               justify: 'space-between',
                               cursor: 'grab',
-                              border: draggedSkillIndex === idx ? '2px dashed var(--accent-primary)' : '1px solid rgba(255, 255, 255, 0.08)',
-                              background: draggedSkillIndex === idx ? 'rgba(99, 102, 241, 0.15)' : undefined,
+                              border: draggedSkillIndex === idx ? '2px dashed var(--accent-primary)' : (editingSkill === s.name ? '1px solid #818cf8' : '1px solid rgba(255, 255, 255, 0.08)'),
+                              background: draggedSkillIndex === idx ? 'rgba(99, 102, 241, 0.15)' : (editingSkill === s.name ? 'rgba(99, 102, 241, 0.08)' : undefined),
                               transition: 'all 0.2s ease',
                               opacity: draggedSkillIndex === idx ? 0.6 : 1
                             }}
@@ -1607,7 +1631,7 @@ export default function AdminPanel({ onBackToSite }) {
                             </div>
 
                             {/* Right: Proficiency % Badge + Action Buttons */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexShrink: 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
                               <span style={{
                                 fontSize: '0.78rem',
                                 color: '#ef4444',
@@ -1621,6 +1645,29 @@ export default function AdminPanel({ onBackToSite }) {
                               }}>
                                 {s.level}%
                               </span>
+
+                              {/* Edit Button */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setNewSkill(s);
+                                  setEditingSkill(s.name);
+                                  window.scrollTo({ top: 220, behavior: 'smooth' });
+                                }}
+                                title="Edit Skill"
+                                style={{
+                                  background: 'rgba(99, 102, 241, 0.15)',
+                                  border: '1px solid rgba(99, 102, 241, 0.3)',
+                                  color: '#818cf8',
+                                  borderRadius: '6px',
+                                  cursor: 'pointer',
+                                  padding: '4px 6px',
+                                  display: 'flex',
+                                  alignItems: 'center'
+                                }}
+                              >
+                                <Pencil size={14} />
+                              </button>
 
                               <button
                                 type="button"
