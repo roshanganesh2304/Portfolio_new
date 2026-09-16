@@ -209,7 +209,7 @@ SKILLS = {
             "name": "App Store",
             "level": 88,
             "category": "Deployment & Publishing",
-            "icon_url": "/images/icons/app-store.svg"
+            "icon_url": "/images/icons/app-store.png"
         },
         {
             "name": "Git",

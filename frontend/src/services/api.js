@@ -71,7 +71,7 @@ export const fetchSkills = async () => {
         { name: "Firebase", level: 88, category: "Cloud & DB", icon_url: "/images/icons/firebase.svg" },
         { name: "REST APIs", level: 92, category: "Backend & Integration", icon_url: "/images/icons/rest-api.svg" },
         { name: "Play Store", level: 88, category: "Deployment & Publishing", icon_url: "/images/icons/play-store.svg" },
-        { name: "App Store", level: 88, category: "Deployment & Publishing", icon_url: "/images/icons/app-store.svg" },
+        { name: "App Store", level: 88, category: "Deployment & Publishing", icon_url: "/images/icons/app-store.png" },
         { name: "Git", level: 92, category: "Tools & Version Control", icon_url: "/images/icons/git.svg" },
         { name: "Node.js", level: 80, category: "Backend & Integration", icon_url: "/images/icons/nodejs.svg" },
         { name: "React", level: 88, category: "Frontend Web", icon_url: "/images/icons/react.svg" },
