@@ -1,6 +1,6 @@
-// API Service to communicate with Python FastAPI Backend
+const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || '';
+const API_BASE = `${BACKEND_URL}/api`;
 
-const API_BASE = '/api';
 
 export const fetchProfile = async () => {
   try {
@@ -181,6 +181,34 @@ export const deleteAdminSkill = async (skillName) => {
   return await res.json();
 };
 
+export const reorderAdminSkills = async (orderedNames) => {
+  const res = await fetch(`${API_BASE}/admin/skills/reorder`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ordered_names: orderedNames }),
+  });
+  if (!res.ok) throw new Error('Failed to reorder skills');
+  return await res.json();
+};
+
+export const saveAdminSoftSkill = async (name) => {
+  const res = await fetch(`${API_BASE}/admin/soft-skills`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  });
+  if (!res.ok) throw new Error('Failed to save soft skill');
+  return await res.json();
+};
+
+export const deleteAdminSoftSkill = async (name) => {
+  const res = await fetch(`${API_BASE}/admin/soft-skills/${encodeURIComponent(name)}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to delete soft skill');
+  return await res.json();
+};
+
 export const uploadAdminFile = async (file) => {
   const formData = new FormData();
   formData.append('file', file);
@@ -206,6 +234,30 @@ export const deleteContactMessage = async (msgId) => {
     method: 'DELETE',
   });
   if (!res.ok) throw new Error('Failed to delete message');
+  return await res.json();
+};
+
+export const fetchCertifications = async () => {
+  const res = await fetch(`${API_BASE}/certifications`);
+  if (!res.ok) return [];
+  return await res.json();
+};
+
+export const saveAdminCertification = async (certData) => {
+  const res = await fetch(`${API_BASE}/admin/certifications`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(certData),
+  });
+  if (!res.ok) throw new Error('Failed to save certification');
+  return await res.json();
+};
+
+export const deleteAdminCertification = async (certId) => {
+  const res = await fetch(`${API_BASE}/admin/certifications/${encodeURIComponent(certId)}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to delete certification');
   return await res.json();
 };
 
