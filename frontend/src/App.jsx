@@ -16,15 +16,20 @@ import {
   fetchProjects,
   fetchSkills,
   fetchEducation,
+  DEFAULT_PROFILE,
+  DEFAULT_EXPERIENCE,
+  DEFAULT_PROJECTS,
+  DEFAULT_SKILLS,
+  DEFAULT_EDUCATION,
 } from './services/api';
 
 export default function App() {
-  const [profile, setProfile] = useState(null);
-  const [experience, setExperience] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [skills, setSkills] = useState(null);
-  const [education, setEducation] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState(DEFAULT_PROFILE);
+  const [experience, setExperience] = useState(DEFAULT_EXPERIENCE);
+  const [projects, setProjects] = useState(DEFAULT_PROJECTS);
+  const [skills, setSkills] = useState(DEFAULT_SKILLS);
+  const [education, setEducation] = useState(DEFAULT_EDUCATION);
+  const [loading, setLoading] = useState(false);
 
   // Active 404 detector for /admin or #admin (Displays 404 page when accessed; see README.md for admin portal instructions)
   const [is404, setIs404] = useState(
@@ -67,7 +72,7 @@ export default function App() {
           fetchEducation(),
         ]);
 
-        setProfile(profData);
+        if (profData) setProfile(profData);
         if (profData?.avatar_url) {
           const faviconLink = document.querySelector("link[rel*='icon']");
           if (faviconLink) {
@@ -77,10 +82,10 @@ export default function App() {
             faviconLink.type = 'image/png';
           }
         }
-        setExperience(expData);
-        setProjects(projData);
-        setSkills(skillData);
-        setEducation(eduData);
+        if (expData?.length) setExperience(expData);
+        if (projData?.length) setProjects(projData);
+        if (skillData) setSkills(skillData);
+        if (eduData) setEducation(eduData);
       } catch (err) {
         console.error('Failed to load portfolio data:', err);
       } finally {
