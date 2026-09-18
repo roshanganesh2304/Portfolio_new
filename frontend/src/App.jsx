@@ -62,6 +62,8 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
+
     const loadData = async () => {
       try {
         const [profData, expData, projData, skillData, eduData] = await Promise.all([
@@ -72,44 +74,40 @@ export default function App() {
           fetchEducation(),
         ]);
 
-        if (profData && profData.name) {
-          setProfile(prev => ({ ...DEFAULT_PROFILE, ...(prev || {}), ...profData }));
-          if (profData.avatar_url) {
-            const faviconLink = document.querySelector("link[rel*='icon']");
-            if (faviconLink) {
-              faviconLink.href = profData.avatar_url.includes('roshan-profile.png') 
-                ? '/images/roshan-profile-round.png' 
-                : profData.avatar_url;
-              faviconLink.type = 'image/png';
-            }
+        if (!isMounted) return;
+
+        if (profData) setProfile(profData);
+        if (profData?.avatar_url) {
+          const faviconLink = document.querySelector("link[rel*='icon']");
+          if (faviconLink) {
+            faviconLink.href = profData.avatar_url.includes('roshan-profile.png') 
+              ? '/images/roshan-profile-round.png' 
+              : profData.avatar_url;
+            faviconLink.type = 'image/png';
           }
         }
-        if (expData && expData.length > 0) {
-          setExperience(expData);
-        }
-        if (projData && projData.length > 0) {
-          setProjects(projData);
-        }
-        if (skillData) {
-          setSkills({
-            technical: (skillData.technical && skillData.technical.length > 0) ? skillData.technical : DEFAULT_SKILLS.technical,
-            soft: (skillData.soft && skillData.soft.length > 0) ? skillData.soft : DEFAULT_SKILLS.soft,
-          });
-        }
-        if (eduData) {
-          setEducation({
-            education: (eduData.education && eduData.education.length > 0) ? eduData.education : DEFAULT_EDUCATION.education,
-            certifications: (eduData.certifications && eduData.certifications.length > 0) ? eduData.certifications : DEFAULT_EDUCATION.certifications,
-          });
-        }
+        if (expData?.length) setExperience(expData);
+        if (projData?.length) setProjects(projData);
+        if (skillData) setSkills(skillData);
+        if (eduData) setEducation(eduData);
       } catch (err) {
-        console.error('Failed to load portfolio data:', err);
+        console.error('Failed to load portfolio data from backend:', err);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
     loadData();
+
+    // Background sync retry after 4 seconds (ensures data syncs even if live backend was sleeping on cold start)
+    const retryTimer = setTimeout(() => {
+      if (isMounted) loadData();
+    }, 4000);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(retryTimer);
+    };
   }, []);
 
   const handleBackToSite = () => {

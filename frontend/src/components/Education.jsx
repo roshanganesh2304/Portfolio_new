@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { GraduationCap, Award, Calendar, MapPin, CheckCircle, ExternalLink } from 'lucide-react';
-import { DEFAULT_EDUCATION } from '../services/api';
 
 export default function Education({ educationData }) {
-  const education = (educationData?.education && educationData.education.length > 0) ? educationData.education : DEFAULT_EDUCATION.education;
-  const certifications = (educationData?.certifications && educationData.certifications.length > 0) ? educationData.certifications : DEFAULT_EDUCATION.certifications;
+  if (!educationData) return null;
+
+  const education = educationData.education || [];
+  const certifications = educationData.certifications || [];
 
   return (
     <section id="education" className="section-padding" style={{ position: 'relative' }}>

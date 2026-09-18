@@ -2,10 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './SocialIcons';
-import { DEFAULT_PROFILE } from '../services/api';
 
 export default function Hero({ profile }) {
-  const prof = { ...DEFAULT_PROFILE, ...(profile || {}) };
+  if (!profile) return null;
 
   return (
     <section id="home" style={{ paddingTop: '7.5rem', paddingBottom: '4.5rem', position: 'relative' }}>
@@ -33,7 +32,7 @@ export default function Hero({ profile }) {
                 letterSpacing: '-0.02em',
               }}
             >
-              <span className="text-gradient">{prof.name}</span>
+              <span className="text-gradient">{profile.name}</span>
             </h1>
 
             {/* Subheading Title */}
@@ -59,7 +58,7 @@ export default function Hero({ profile }) {
                 marginBottom: '1.75rem',
               }}
             >
-              {prof.summary || "Full-stack developer and Computer Engineering graduate skilled in Python, Django, React, and Flutter, with experience building cross-platform apps and AI-powered solutions."}
+              Full-stack developer and Computer Engineering graduate skilled in Python, Django, React, and Flutter, with experience building cross-platform apps and AI-powered solutions.
             </p>
 
             {/* Tech Stack Pills List */}
@@ -101,7 +100,7 @@ export default function Hero({ profile }) {
                 Get In Touch
               </a>
               <a
-                href={prof.github || "https://github.com/roshanganesh2304"}
+                href={profile.github}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-secondary"
@@ -111,7 +110,7 @@ export default function Hero({ profile }) {
                 <GithubIcon size={20} />
               </a>
               <a
-                href={prof.linkedin || "https://linkedin.com/in/roshan-ganesh-i"}
+                href={profile.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-secondary"

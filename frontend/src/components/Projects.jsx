@@ -2,14 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
-import { DEFAULT_PROJECTS } from '../services/api';
 
 export default function Projects({ projects }) {
   const [activeTab, setActiveTab] = useState('All');
   const [selectedProject, setSelectedProject] = useState(null);
   const scrollRef = useRef(null);
-
-  const projectList = (projects && projects.length > 0) ? projects : DEFAULT_PROJECTS;
 
   // Lock background body scroll cleanly when modal is active
   useEffect(() => {
@@ -23,6 +20,8 @@ export default function Projects({ projects }) {
     };
   }, [selectedProject]);
 
+  if (!projects || projects.length === 0) return null;
+
   const categories = ['All', 'Mobile App', 'Full-Stack Web', 'AI & Python'];
 
   const getCategoryPriority = (catStr) => {
@@ -34,8 +33,8 @@ export default function Projects({ projects }) {
   };
 
   const filteredProjects = activeTab === 'All'
-    ? [...projectList].sort((a, b) => getCategoryPriority(a.category) - getCategoryPriority(b.category))
-    : projectList.filter(p => (p.category || '').toLowerCase().includes(activeTab.toLowerCase()));
+    ? [...projects].sort((a, b) => getCategoryPriority(a.category) - getCategoryPriority(b.category))
+    : projects.filter(p => p.category.toLowerCase().includes(activeTab.toLowerCase()));
 
   const handleScrollLeft = () => {
     if (scrollRef.current) {

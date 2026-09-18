@@ -1,10 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Smartphone, Server, Cpu, Layers, Award, Terminal, Code } from 'lucide-react';
-import { DEFAULT_PROFILE } from '../services/api';
 
 export default function About({ profile }) {
-  const statsList = (profile?.stats && profile.stats.length > 0) ? profile.stats : DEFAULT_PROFILE.stats;
+  if (!profile) return null;
 
   const pillars = [
     {
@@ -44,7 +43,7 @@ export default function About({ profile }) {
 
         {/* Stats Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', marginBottom: '4rem' }}>
-          {statsList.map((stat, idx) => (
+          {profile.stats && profile.stats.map((stat, idx) => (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, y: 20 }}
