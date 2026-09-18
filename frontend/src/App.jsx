@@ -72,20 +72,36 @@ export default function App() {
           fetchEducation(),
         ]);
 
-        if (profData) setProfile(profData);
-        if (profData?.avatar_url) {
-          const faviconLink = document.querySelector("link[rel*='icon']");
-          if (faviconLink) {
-            faviconLink.href = profData.avatar_url.includes('roshan-profile.png') 
-              ? '/images/roshan-profile-round.png' 
-              : profData.avatar_url;
-            faviconLink.type = 'image/png';
+        if (profData && profData.name) {
+          setProfile(prev => ({ ...DEFAULT_PROFILE, ...(prev || {}), ...profData }));
+          if (profData.avatar_url) {
+            const faviconLink = document.querySelector("link[rel*='icon']");
+            if (faviconLink) {
+              faviconLink.href = profData.avatar_url.includes('roshan-profile.png') 
+                ? '/images/roshan-profile-round.png' 
+                : profData.avatar_url;
+              faviconLink.type = 'image/png';
+            }
           }
         }
-        if (expData?.length) setExperience(expData);
-        if (projData?.length) setProjects(projData);
-        if (skillData) setSkills(skillData);
-        if (eduData) setEducation(eduData);
+        if (expData && expData.length > 0) {
+          setExperience(expData);
+        }
+        if (projData && projData.length > 0) {
+          setProjects(projData);
+        }
+        if (skillData) {
+          setSkills({
+            technical: (skillData.technical && skillData.technical.length > 0) ? skillData.technical : DEFAULT_SKILLS.technical,
+            soft: (skillData.soft && skillData.soft.length > 0) ? skillData.soft : DEFAULT_SKILLS.soft,
+          });
+        }
+        if (eduData) {
+          setEducation({
+            education: (eduData.education && eduData.education.length > 0) ? eduData.education : DEFAULT_EDUCATION.education,
+            certifications: (eduData.certifications && eduData.certifications.length > 0) ? eduData.certifications : DEFAULT_EDUCATION.certifications,
+          });
+        }
       } catch (err) {
         console.error('Failed to load portfolio data:', err);
       } finally {

@@ -1,12 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Code2, Award, CheckCircle2 } from 'lucide-react';
+import { DEFAULT_SKILLS } from '../services/api';
 
 export default function Skills({ skills }) {
-  if (!skills) return null;
-
-  const technicalSkills = skills.technical || [];
-  const softSkills = skills.soft || [];
+  const technicalSkills = (skills?.technical && skills.technical.length > 0) ? skills.technical : DEFAULT_SKILLS.technical;
+  const softSkills = (skills?.soft && skills.soft.length > 0) ? skills.soft : DEFAULT_SKILLS.soft;
 
   return (
     <section id="skills" className="section-padding" style={{ position: 'relative' }}>

@@ -1,9 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Briefcase, Calendar, MapPin, CheckCircle, ChevronRight, Sparkles } from 'lucide-react';
+import { DEFAULT_EXPERIENCE } from '../services/api';
 
 export default function Experience({ experience }) {
-  if (!experience || experience.length === 0) return null;
+  const expList = (experience && experience.length > 0) ? experience : DEFAULT_EXPERIENCE;
 
   return (
     <section id="experience" className="section-padding" style={{ position: 'relative' }}>
@@ -33,7 +34,7 @@ export default function Experience({ experience }) {
             }}
           />
 
-          {experience.map((exp, idx) => (
+          {expList.map((exp, idx) => (
             <motion.div
               key={exp.id || idx}
               initial={{ opacity: 0, x: -30 }}

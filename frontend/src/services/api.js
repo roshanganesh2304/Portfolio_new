@@ -245,7 +245,12 @@ const fetchWithTimeout = async (url, options = {}, timeoutMs = 2500) => {
 export const fetchProfile = async () => {
   try {
     const data = await fetchWithTimeout(`${API_BASE}/profile`);
-    return data && data.name ? data : DEFAULT_PROFILE;
+    if (!data || !data.name) return DEFAULT_PROFILE;
+    return {
+      ...DEFAULT_PROFILE,
+      ...data,
+      stats: (data.stats && data.stats.length > 0) ? data.stats : DEFAULT_PROFILE.stats,
+    };
   } catch (err) {
     console.warn('API Error (Profile), falling back to cached profile:', err);
     return DEFAULT_PROFILE;
@@ -255,7 +260,16 @@ export const fetchProfile = async () => {
 export const fetchExperience = async () => {
   try {
     const data = await fetchWithTimeout(`${API_BASE}/experience`);
-    return Array.isArray(data) && data.length > 0 ? data : DEFAULT_EXPERIENCE;
+    if (!Array.isArray(data) || data.length === 0) return DEFAULT_EXPERIENCE;
+    return data.map(e => {
+      const defaultMatch = DEFAULT_EXPERIENCE.find(de => de.id === e.id) || {};
+      return {
+        ...defaultMatch,
+        ...e,
+        highlights: (e.highlights && e.highlights.length > 0) ? e.highlights : (defaultMatch.highlights || []),
+        technologies: (e.technologies && e.technologies.length > 0) ? e.technologies : (defaultMatch.technologies || []),
+      };
+    });
   } catch (err) {
     console.warn('API Error (Experience), using cached fallback:', err);
     return DEFAULT_EXPERIENCE;
@@ -268,7 +282,18 @@ export const fetchProjects = async (category = 'All') => {
       ? `${API_BASE}/projects?category=${encodeURIComponent(category)}`
       : `${API_BASE}/projects`;
     const data = await fetchWithTimeout(url);
-    return Array.isArray(data) && data.length > 0 ? data : DEFAULT_PROJECTS;
+    if (!Array.isArray(data) || data.length === 0) return DEFAULT_PROJECTS;
+    return data.map(p => {
+      const defaultMatch = DEFAULT_PROJECTS.find(dp => dp.id === p.id) || {};
+      return {
+        ...defaultMatch,
+        ...p,
+        technologies: (p.technologies && p.technologies.length > 0) ? p.technologies : (defaultMatch.technologies || []),
+        image_url: p.image_url || defaultMatch.image_url || "/images/video-transcript-chatbot.jpg",
+        description: p.description || defaultMatch.description || "",
+        summary: p.summary || defaultMatch.summary || "",
+      };
+    });
   } catch (err) {
     console.warn('API Error (Projects), using cached fallback:', err);
     return DEFAULT_PROJECTS;
@@ -278,7 +303,11 @@ export const fetchProjects = async (category = 'All') => {
 export const fetchSkills = async () => {
   try {
     const data = await fetchWithTimeout(`${API_BASE}/skills`);
-    return (data && (data.technical?.length || data.soft?.length)) ? data : DEFAULT_SKILLS;
+    if (!data) return DEFAULT_SKILLS;
+    return {
+      technical: (data.technical && data.technical.length > 0) ? data.technical : DEFAULT_SKILLS.technical,
+      soft: (data.soft && data.soft.length > 0) ? data.soft : DEFAULT_SKILLS.soft,
+    };
   } catch (err) {
     console.warn('API Error (Skills), using default skills fallback:', err);
     return DEFAULT_SKILLS;
@@ -288,7 +317,11 @@ export const fetchSkills = async () => {
 export const fetchEducation = async () => {
   try {
     const data = await fetchWithTimeout(`${API_BASE}/education`);
-    return (data && (data.education?.length || data.certifications?.length)) ? data : DEFAULT_EDUCATION;
+    if (!data) return DEFAULT_EDUCATION;
+    return {
+      education: (data.education && data.education.length > 0) ? data.education : DEFAULT_EDUCATION.education,
+      certifications: (data.certifications && data.certifications.length > 0) ? data.certifications : DEFAULT_EDUCATION.certifications,
+    };
   } catch (err) {
     console.warn('API Error (Education), using cached fallback:', err);
     return DEFAULT_EDUCATION;
